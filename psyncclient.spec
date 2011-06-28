@@ -57,6 +57,11 @@ Development files for %name .
 %setup -c 
 
 %build
+
+
+sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./psyncipclibrary/psyncipclibrary/psyncipclibrary.pro
+
+
 mkdir -p .lib
 %make -C libcfg
 cp libcfg/libcfg.so .lib
