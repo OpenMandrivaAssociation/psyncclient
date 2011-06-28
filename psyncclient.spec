@@ -7,6 +7,7 @@ Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
+BuildRequires: boost-devel
 
 %description
 ROSA Sync client
