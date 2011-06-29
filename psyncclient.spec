@@ -1,7 +1,7 @@
 Summary:       ROSA Sync client
 Name:          psyncclient
 Version:       0.1
-Release:       2
+Release:       3
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
@@ -41,6 +41,7 @@ Qt Zeitgeist Library.
 Group:          Development/KDE and Qt
 Summary:        %name developement files
 Provides:       %name-devel = %version-%release
+Requires:       %libpsyncipc = %version-%release
 
 %description -n %develname
 Development files for %name .
