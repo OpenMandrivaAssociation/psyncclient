@@ -15,8 +15,8 @@ ROSA Sync client
 %files -f psyncconfig.lang
 %{_bindir}/*
 %{_sysconfdir}/skel/.psyncclient
-%{_sysconfdir}/usr/share/autostart/psyncnotify.desktop
-%{_sysconfdir}/usr/share/autostart/psyncd.desktop
+%{_datadir}/autostart/psyncnotify.desktop
+%{_datadir}/autostart/psyncd.desktop
 
 #-------------------------------------------------------------------------------
 
