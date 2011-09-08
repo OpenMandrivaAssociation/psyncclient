@@ -1,7 +1,7 @@
 Summary:       ROSA Sync client
 Name:          psyncclient
 Version:       0.1
-Release:       4
+Release:       9
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
@@ -17,31 +17,35 @@ ROSA Sync client
 %{_sysconfdir}/skel/.psyncclient
 %{_datadir}/autostart/psyncnotify.desktop
 %{_datadir}/autostart/psyncd.desktop
+%{_datadir}/icons/default.kde4/128x128/apps/2safe.png
+%{_datadir}/kde4/services/kcm-2safe.desktop
 
 #-------------------------------------------------------------------------------
 
-%define major_psyncipc  1
-%define libpsyncipc %mklibname psyncipc %major_psyncipc
+%define major_psync 1
+%define libpsync %mklibname psync %major_psync
       
-%package -n %libpsyncipc
+%package -n %libpsync
 Group:          Graphical desktop/KDE
 Summary:        ROSA Sync client
+Obsoletes:	libpsyncipc1
       
-%description -n %libpsyncipc
-Qt Zeitgeist Library.
+%description -n %libpsync
+psync library
 
-%files -n %libpsyncipc
-%{_libdir}/libpsyncipc.so.%{major_psyncipc}*
+%files -n %libpsync
+%{_libdir}/libpsync.so.%{major_psync}*
 
 #-------------------------------------------------------------------------------
 
-%define develname %mklibname -d psyncipc
+%define develname %mklibname -d psync
 
 %package -n     %develname
 Group:          Development/KDE and Qt
 Summary:        %name developement files
 Provides:       %name-devel = %version-%release
-Requires:       %libpsyncipc = %version-%release
+Requires:       %libpsync = %version-%release
+Obsoletes:	libpsyncipc-devel
 
 %description -n %develname
 Development files for %name .
@@ -49,7 +53,7 @@ Development files for %name .
 %files -n %develname
 
 %{_libdir}/libcfg.so
-%{_libdir}/libpsyncipc.so
+%{_libdir}/libpsync.so
 %{_libdir}/libcfg.a
 
 #--------------------------------------------------------------------
@@ -60,42 +64,42 @@ Development files for %name .
 %build
 
 
-sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./psyncipclibrary/psyncipclibrary/psyncipclibrary.pro
+sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./libpsync/libpsync.pro
 
 
 mkdir -p .lib
 %make -C libcfg
 cp libcfg/libcfg.so .lib
 
-cd psyncipclibrary/psyncipclibrary
-qmake psyncipclibrary.pro
-cd ../..
-%make -C psyncipclibrary/psyncipclibrary
-cp psyncipclibrary/psyncipclibrary/libpsyncipc.so.1.0.0 .lib
+cd libpsync
+qmake libpsync.pro
+cd ..
+%make -C libpsync
+cp libpsync/libpsync.so.1.0.0 .lib
 
 cd .lib
-ln -s libpsyncipc.so.1.0.0 libpsyncipc.so.1.0
-ln -s libpsyncipc.so.1.0.0 libpsyncipc.so.1
-ln -s libpsyncipc.so.1.0.0 libpsyncipc.so
+ln -s libpsync.so.1.0.0 libpsync.so.1.0
+ln -s libpsync.so.1.0.0 libpsync.so.1
+ln -s libpsync.so.1.0.0 libpsync.so
 cd ..
 
-cd psyncconfig/psyncconfig
+cd psyncconfig
 qmake psyncconfig.pro
 %make
-cd ../..
+cd ..
 
-cd psyncnotify/psyncnotify
+cd psyncnotify
 qmake psyncnotify.pro
 %make
-cd ../..
+cd ..
 
 make -C syncd
 
 %install
 make PREFIX=%buildroot%{_libdir} -C libcfg install
-make INSTALL_ROOT=%buildroot -C psyncipclibrary/psyncipclibrary install
-make INSTALL_ROOT=%buildroot -C psyncconfig/psyncconfig install
-make INSTALL_ROOT=%buildroot -C psyncnotify/psyncnotify install
+make INSTALL_ROOT=%buildroot -C libpsync install
+make INSTALL_ROOT=%buildroot -C psyncconfig install
+make INSTALL_ROOT=%buildroot -C psyncnotify install
 make INSTALL_ROOT=%buildroot -C syncd install
                            
 %find_lang psyncconfig psyncnotify
