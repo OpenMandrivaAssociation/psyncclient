@@ -1,40 +1,51 @@
-Summary:       ROSA Sync client
+Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       9
+Release:       14
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
+Requires:      %{_lib}psync = %{version}-%{release}
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
 BuildRequires: libuuid-devel
+BuildRequires: libneon-devel
 
 %description
-ROSA Sync client
+MandrivaSync client
 
 %files -f psyncconfig.lang
 %{_bindir}/*
 %{_sysconfdir}/skel/.psyncclient
+%{_sysconfdir}/skel/sync-unresolved
 %{_datadir}/autostart/psyncnotify.desktop
 %{_datadir}/autostart/psyncd.desktop
-%{_datadir}/icons/default.kde4/128x128/apps/2safe.png
-%{_datadir}/kde4/services/kcm-2safe.desktop
+%{_datadir}/icons/default.kde4/128x128/apps/sync.png
+%{_datadir}/icons/default.kde4/64x64/apps/sync.png
+%{_datadir}/icons/default.kde4/48x48/apps/sync.png
+%{_datadir}/icons/default.kde4/32x32/apps/sync.png
+%{_datadir}/icons/default.kde4/22x22/apps/sync.png
+%{_datadir}/icons/default.kde4/16x16/apps/sync.png
+%{_datadir}/kde4/services/kcm_sync.desktop
+%{_libdir}/kde4/kcm_sync.so
 
 #-------------------------------------------------------------------------------
 
 %define major_psync 1
-%define libpsync %mklibname psync %major_psync
+%define libpsync %mklibname psync
       
 %package -n %libpsync
 Group:          Graphical desktop/KDE
-Summary:        ROSA Sync client
-Obsoletes:	libpsyncipc1
+Summary:        MandrivaSync client
+Obsoletes:	%{_lib}psyncipc1,%{_lib}psync1
       
 %description -n %libpsync
 psync library
 
 %files -n %libpsync
 %{_libdir}/libpsync.so.%{major_psync}*
+%{_libdir}/libcfg.so
+%{_libdir}/libpsync.so
 
 #-------------------------------------------------------------------------------
 
@@ -52,9 +63,8 @@ Development files for %name .
 
 %files -n %develname
 
-%{_libdir}/libcfg.so
-%{_libdir}/libpsync.so
 %{_libdir}/libcfg.a
+%{_includedir}/psync/*
 
 #--------------------------------------------------------------------
 
@@ -65,6 +75,7 @@ Development files for %name .
 
 
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./libpsync/libpsync.pro
+sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./psyncconfig/psyncconfig.pro
 
 
 mkdir -p .lib
@@ -103,4 +114,19 @@ make INSTALL_ROOT=%buildroot -C psyncnotify install
 make INSTALL_ROOT=%buildroot -C syncd install
                            
 %find_lang psyncconfig psyncnotify
+
+%post 
+RES=`ls /home`
+for i in $RES; do
+    if [ -d /home/$i/.psyncclient ] ; then
+        find /home/$i/.psyncclient/ ! -regex '.*\(psyncclient.*/\|cfg\|cfg/user\|login\|password\)' -delete
+	cp -r /etc/skel/.psyncclient/* /home/$i/.psyncclient/
+        owner=`stat -c %U /home/$i/.psyncclient`
+        group=`stat -c %G /home/$i/.psyncclient`
+        chown $owner:$group /home/$i/.psyncclient/* -R
+        mkdir -p /home/$i/sync-unresolved
+        chown $owner:$group /home/$i/sync-unresolved
+    fi
+done
+                           
 
