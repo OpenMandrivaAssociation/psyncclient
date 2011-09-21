@@ -1,11 +1,15 @@
+%define major 1
+%define libname %mklibname psync %{major}
+%define develname %mklibname -d psync
+
 Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       14
+Release:       %mkrel 15
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
-Requires:      %{_lib}psync = %{version}-%{release}
+Requires: %{libname} >= %{version}-%{release}
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
 BuildRequires: libuuid-devel
@@ -31,32 +35,39 @@ MandrivaSync client
 
 #-------------------------------------------------------------------------------
 
-%define major_psync 1
-%define libpsync %mklibname psync
       
-%package -n %libpsync
+%package -n %libname
 Group:          Graphical desktop/KDE
 Summary:        MandrivaSync client
-Obsoletes:	%{_lib}psyncipc1,%{_lib}psync1
-      
-%description -n %libpsync
+# just wonderful...
+# In order to satisfy the 'libpsync.so.1()(64bit)' dependency, one of the following packages is needed:
+# 1- lib64psync-0.1-14-mdv2011.0.x86_64: MandrivaSync client (to install)
+# 2- lib64psync1-0.1-10-mdv2011.0.x86_64: ROSA Sync client (to install)
+# 3- lib641-0.1-8-mdv2011.0.x86_64: ROSA Sync client (to install)
+# 4- lib64%major_psync-0.1-6-mdv2011.0.x86_64: ROSA Sync client (to install)
+# What is your choice? (1-4) ^C
+Obsoletes: %{mklibname psync} >= 0.1
+Obsoletes: %{mklibname psyncipc 1} >= 0.1
+Obsoletes: %{mklibname 1} >= 0.1
+Obsoletes: %{mklibname %major_psync} >= 0.1
+
+%description -n %libname
 psync library
 
-%files -n %libpsync
-%{_libdir}/libpsync.so.%{major_psync}*
+%files -n %libname
+%{_libdir}/libpsync.so.%{major}*
 %{_libdir}/libcfg.so
 %{_libdir}/libpsync.so
 
 #-------------------------------------------------------------------------------
 
-%define develname %mklibname -d psync
 
 %package -n     %develname
 Group:          Development/KDE and Qt
 Summary:        %name developement files
 Provides:       %name-devel = %version-%release
-Requires:       %libpsync = %version-%release
-Obsoletes:	libpsyncipc-devel
+Requires: %{libname} >= %{version}-%{release}
+Obsoletes: %{mklibname psyncipc -d}
 
 %description -n %develname
 Development files for %name .
@@ -69,10 +80,9 @@ Development files for %name .
 #--------------------------------------------------------------------
 
 %prep
-%setup -c 
+%setup -c -q
 
 %build
-
 
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./libpsync/libpsync.pro
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./psyncconfig/psyncconfig.pro
@@ -86,12 +96,12 @@ cd libpsync
 qmake libpsync.pro
 cd ..
 %make -C libpsync
-cp libpsync/libpsync.so.1.0.0 .lib
+cp libpsync/libpsync.so.%{major}.0.0 .lib
 
 cd .lib
-ln -s libpsync.so.1.0.0 libpsync.so.1.0
-ln -s libpsync.so.1.0.0 libpsync.so.1
-ln -s libpsync.so.1.0.0 libpsync.so
+ln -snf libpsync.so.%{major}.0.0 libpsync.so.%{major}.0
+ln -snf libpsync.so.%{major}.0 libpsync.so.%{major}
+ln -snf libpsync.so.%{major} libpsync.so
 cd ..
 
 cd psyncconfig
@@ -112,7 +122,7 @@ make INSTALL_ROOT=%buildroot -C libpsync install
 make INSTALL_ROOT=%buildroot -C psyncconfig install
 make INSTALL_ROOT=%buildroot -C psyncnotify install
 make INSTALL_ROOT=%buildroot -C syncd install
-                           
+
 %find_lang psyncconfig psyncnotify
 
 %post 
@@ -128,5 +138,3 @@ for i in $RES; do
         chown $owner:$group /home/$i/sync-unresolved
     fi
 done
-                           
-
