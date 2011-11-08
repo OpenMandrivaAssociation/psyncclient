@@ -11,12 +11,13 @@ Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
 Requires: %{libname} >= %{version}-%{release}
 Requires: %{_lib}config9
+Requires: %{_lib}openssl1.0.0
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
 BuildRequires: libuuid-devel
 BuildRequires: libneon-devel
 BuildRequires: %{_lib}config-devel
-BuildRequires: %{_lib}openssl1.0.0
+BuildRequires:  libopenssl-devel
 Epoch: 1
 
 %description
