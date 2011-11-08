@@ -5,15 +5,17 @@
 Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       %mkrel 16
+Release:       %mkrel 21
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
 Requires: %{libname} >= %{version}-%{release}
+Requires: %{_lib}config9
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
 BuildRequires: libuuid-devel
 BuildRequires: libneon-devel
+BuildRequires: %{_lib}config-devel
 Epoch: 1
 
 %description
@@ -22,15 +24,20 @@ MandrivaSync client
 %files -f psyncconfig.lang
 %{_bindir}/*
 %{_sysconfdir}/skel/.psyncclient
-%{_sysconfdir}/skel/sync-unresolved
+#%{_sysconfdir}/skel/.sync-unresolved
 %{_datadir}/autostart/psyncnotify.desktop
 %{_datadir}/autostart/psyncd.desktop
-%{_datadir}/icons/default.kde4/128x128/apps/sync.png
-%{_datadir}/icons/default.kde4/64x64/apps/sync.png
-%{_datadir}/icons/default.kde4/48x48/apps/sync.png
-%{_datadir}/icons/default.kde4/32x32/apps/sync.png
-%{_datadir}/icons/default.kde4/22x22/apps/sync.png
-%{_datadir}/icons/default.kde4/16x16/apps/sync.png
+%{_datadir}/apps/psyncnotify/psyncnotify.notifyrc
+%{_datadir}/icons/hicolor/128x128/apps/sync.png
+%{_datadir}/icons/hicolor/112x112/apps/sync.png
+%{_datadir}/icons/hicolor/96x96/apps/sync.png
+%{_datadir}/icons/hicolor/72x72/apps/sync.png
+%{_datadir}/icons/hicolor/64x64/apps/sync.png
+%{_datadir}/icons/hicolor/48x48/apps/sync.png
+%{_datadir}/icons/hicolor/32x32/apps/sync.png
+%{_datadir}/icons/hicolor/24x24/apps/sync.png
+%{_datadir}/icons/hicolor/22x22/apps/sync.png
+%{_datadir}/icons/hicolor/16x16/apps/sync.png
 %{_datadir}/kde4/services/kcm_sync.desktop
 %{_libdir}/kde4/kcm_sync.so
 
@@ -57,8 +64,11 @@ psync library
 
 %files -n %libname
 %{_libdir}/libpsync.so.%{major}*
-%{_libdir}/libcfg.so
+#%{_libdir}/libcfg.so
+%{_libdir}/liblcfg.so.%{major}*
+%{_libdir}/liblcfg.so
 %{_libdir}/libpsync.so
+
 
 #-------------------------------------------------------------------------------
 
@@ -75,7 +85,7 @@ Development files for %name .
 
 %files -n %develname
 
-%{_libdir}/libcfg.a
+#%{_libdir}/libcfg.a
 %{_includedir}/psync/*
 
 #--------------------------------------------------------------------
@@ -85,13 +95,28 @@ Development files for %name .
 
 %build
 
+sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./liblcfg/liblcfg.pro
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./libpsync/libpsync.pro
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./psyncconfig/psyncconfig.pro
+sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./syncconfigapp/psyncconfig.pro
 
 
 mkdir -p .lib
-%make -C libcfg
-cp libcfg/libcfg.so .lib
+#%make -C libcfg
+#cp libcfg/libcfg.so .lib
+
+
+cd liblcfg
+qmake liblcfg.pro
+cd ..
+%make -C liblcfg
+cp liblcfg/liblcfg.so.%{major}.0.0 .lib
+
+cd .lib
+ln -s liblcfg.so.%{major}.0.0 liblcfg.so.%{major}.0
+ln -s liblcfg.so.%{major}.0.0 liblcfg.so.%{major}
+ln -s liblcfg.so.%{major}.0.0 liblcfg.so
+cd ..
 
 cd libpsync
 qmake libpsync.pro
@@ -110,6 +135,11 @@ qmake psyncconfig.pro
 %make
 cd ..
 
+cd syncconfigapp
+qmake psyncconfig.pro
+%make
+cd ..
+
 cd psyncnotify
 qmake psyncnotify.pro
 %make
@@ -118,24 +148,58 @@ cd ..
 make -C syncd
 
 %install
-make PREFIX=%buildroot%{_libdir} -C libcfg install
+#make PREFIX=%buildroot%{_libdir} -C libcfg install
+make INSTALL_ROOT=%buildroot -C liblcfg install
 make INSTALL_ROOT=%buildroot -C libpsync install
 make INSTALL_ROOT=%buildroot -C psyncconfig install
 make INSTALL_ROOT=%buildroot -C psyncnotify install
 make INSTALL_ROOT=%buildroot -C syncd install
+make INSTALL_ROOT=%buildroot -C syncconfigapp install
+
+
 
 %find_lang psyncconfig psyncnotify
 
-%post 
+%post
 RES=`ls /home`
 for i in $RES; do
     if [ -d /home/$i/.psyncclient ] ; then
-        find /home/$i/.psyncclient/ ! -regex '.*\(psyncclient.*/\|cfg\|cfg/user\|login\|password\)' -delete
-	cp -r /etc/skel/.psyncclient/* /home/$i/.psyncclient/
-        owner=`stat -c %U /home/$i/.psyncclient`
-        group=`stat -c %G /home/$i/.psyncclient`
-        chown $owner:$group /home/$i/.psyncclient/* -R
-        mkdir -p /home/$i/sync-unresolved
-        chown $owner:$group /home/$i/sync-unresolved
+        if [[ ! -f /home/$i/.psyncclient/sync.cfg || `stat -c %s /home/$i/.psyncclient/sync.cfg` == 413 ]] ; then
+            array[0]=`[ -f /home/$i/.psyncclient/cfg/server/address ] && cat /home/$i/.psyncclient/cfg/server/address || echo 'sync1.mandrivasync.com' ` #Address
+            array[1]=`[ -f /home/$i/.psyncclient/cfg/server/port ] && cat /home/$i/.psyncclient/cfg/server/port || echo '443' ` # Port
+            array[2]=`[ -f /home/$i/.psyncclient/cfg/server/ssl ] && cat /home/$i/.psyncclient/cfg/server/ssl || echo 'yes'` # ssl
+            array[3]=`[ -f /home/$i/.psyncclient/cfg/user/default_folder ] && cat /home/$i/.psyncclient/cfg/user/default_folder || echo ''` # Default folder
+            array[4]='900' # Interval
+#           array[5]=`[ -f /home/$i/.psyncclient/cfg/user/lastsync ] && cat /home/$i/.psyncclient/cfg/user/lastsync` # Last synchronization
+            array[5]='' # Last sync
+            array[6]=`[ -f /home/$i/.psyncclient/cfg/user/login ] && cat /home/$i/.psyncclient/cfg/user/login || echo ''` # Login
+            array[7]=`[ -f /home/$i/.psyncclient/cfg/user/password ] && cat /home/$i/.psyncclient/cfg/user/password || echo '' ` # Password
+            array[8]=`[ -f /home/$i/.psyncclient/cfg/user/show_tray_icon ] && cat /home/$i/.psyncclient/cfg/user/show_tray_icon || echo '2'` # Tray icon
+            array[9]=`[ -f /home/$i/.psyncclient/cfg/user/sync_is ] && cat /home/$i/.psyncclient/cfg/user/sync_is || echo '0' ` # Sync_is
+            array[10]='10' # Timer
+
+#            find /home/$i/.psyncclient/ ! -regex '.*\(.psyncclient.*/\|sync.cfg\)' -delete
+            cp -rn /etc/skel/.psyncclient/* /home/$i/.psyncclient/
+            find /home/$i/.psyncclient/ ! -regex '.*\(.psyncclient.*/\|sync.cfg\)' -delete
+            owner=`stat -c %U /home/$i/.psyncclient`
+            group=`stat -c %G /home/$i/.psyncclient`
+            chown $owner:$group /home/$i/.psyncclient/* -R
+            mkdir -p /home/$i/.sync-unresolved
+            chown $owner:$group /home/$i/.sync-unresolved
+
+            
+            sed -i -e "s/address = \"sync1.mandrivasync.com\";/address = \"${array[0]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/port = \"443\";/port = \"${array[1]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/ssl = \"yes\";/ssl = \"${array[2]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/sync_is = 0;/sync_is = ${array[9]};/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/interval = 0;/interval = ${array[4]};/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/default_folder = \"\";/default_folder = \"${array[3]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/login = \"\";/login = \"${array[6]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/password = \"\";/password = \"${array[7]}\";/" /home/$i/.psyncclient/sync.cfg
+            sed -i -e "s/show_tray_icon = 2;/show_tray_icon = ${array[8]};/" /home/$i/.psyncclient/sync.cfg
+#           echo 'works'
+        else
+            find /home/$i/.psyncclient/* ! -regex '.*\(.psyncclient.*/\|sync.cfg\)' -delete
+        fi
     fi
 done
