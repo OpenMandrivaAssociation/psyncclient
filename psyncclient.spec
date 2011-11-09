@@ -17,7 +17,8 @@ BuildRequires: kdelibs4-devel
 BuildRequires: libuuid-devel
 BuildRequires: libneon-devel
 BuildRequires: %{_lib}config-devel
-BuildRequires:  libopenssl-devel
+BuildRequires: %{_lib}openssl-devel
+#BuildRequires: %{_lib}openssl1.0.0-devel
 Epoch: 1
 
 %description
