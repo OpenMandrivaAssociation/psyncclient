@@ -5,7 +5,7 @@
 Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       %mkrel 21
+Release:       %mkrel 22
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
@@ -19,6 +19,7 @@ BuildRequires: libneon-devel
 BuildRequires: %{_lib}config-devel
 BuildRequires: %{_lib}openssl-devel
 #BuildRequires: %{_lib}openssl1.0.0-devel
+BuildRequires: %{_lib}krb53
 Epoch: 1
 
 %description
