@@ -162,7 +162,7 @@ make INSTALL_ROOT=%buildroot -C syncconfigapp install
 
 
 
-%find_lang psyncconfig psyncnotify
+#%find_lang psyncconfig psyncnotify
 
 %post
 RES=`ls /home`
