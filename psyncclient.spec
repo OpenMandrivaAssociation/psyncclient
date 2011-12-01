@@ -14,8 +14,8 @@ Requires: %{_lib}config9
 Requires: %{_lib}openssl1.0.0
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
-BuildRequires: libuuid-devel
-BuildRequires: libneon-devel
+BuildRequires: %{_lib}uuid-devel
+BuildRequires: %{_lib}neon-devel
 BuildRequires: %{_lib}config-devel
 BuildRequires: %{_lib}openssl-devel
 #BuildRequires: %{_lib}openssl1.0.0-devel
