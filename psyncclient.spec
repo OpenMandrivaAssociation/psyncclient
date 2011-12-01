@@ -25,7 +25,7 @@ Epoch: 1
 %description
 MandrivaSync client
 
-%files -f psyncconfig.lang
+#%files -f psyncconfig.lang
 %{_bindir}/*
 %{_sysconfdir}/skel/.psyncclient
 #%{_sysconfdir}/skel/.sync-unresolved
