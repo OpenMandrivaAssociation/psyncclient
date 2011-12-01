@@ -5,7 +5,7 @@
 Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       %mkrel 24
+Release:       %mkrel 25
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
@@ -62,6 +62,8 @@ Obsoletes: %{mklibname psync} >= 0.1
 Obsoletes: %{mklibname psyncipc 1} >= 0.1
 Obsoletes: %{mklibname 1} >= 0.1
 Obsoletes: %{mklibname %major_psync} >= 0.1
+
+%undefine __find_requires
 
 %description -n %libname
 psync library
