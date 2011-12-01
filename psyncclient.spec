@@ -25,8 +25,7 @@ Epoch: 1
 %description
 MandrivaSync client
 
-%files 
-#-f psyncconfig.lang
+%files -f %name.lang
 %{_bindir}/*
 %{_sysconfdir}/skel/.psyncclient
 #%{_sysconfdir}/skel/.sync-unresolved
@@ -163,7 +162,7 @@ make INSTALL_ROOT=%buildroot -C syncconfigapp install
 
 
 
-#%find_lang psyncconfig psyncnotify
+%find_lang %name --all-name --with-kde
 
 %post
 RES=`ls /home`
