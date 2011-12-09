@@ -5,7 +5,7 @@
 Summary:       MandrivaSync client
 Name:          psyncclient
 Version:       0.1
-Release:       %mkrel 25
+Release:       %mkrel 26
 License:       GPLv2
 Group:         Graphical desktop/KDE
 Source:        %{name}-%{version}.tar.gz
