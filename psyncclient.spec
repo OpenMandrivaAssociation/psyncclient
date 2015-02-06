@@ -1,3 +1,7 @@
+# dolphin plugin requires the iconverlay plugin patch in kdebase
+# which is currently not enabled
+%define with_dolphin 0
+
 Summary:       ROSA Sync client
 Name:          psyncclient
 Version:       0.1
@@ -6,6 +10,7 @@ License:       GPLv3
 Group:         Graphical desktop/KDE
 URL:           http://2safe.com
 Source:        %{name}-%{version}.tar.gz
+Patch1:		psyncclient-0.1-null.patch
 Requires:      %{_lib}psync = %{version}-%{release}
 Requires:      %{_lib}config9 >= 1.4.8
 Requires:      %{_lib}jsoncpp0 >= 0.5.0
@@ -45,23 +50,24 @@ Desktop client to synchronization user's data. ROSA Sync client.
 %{_datadir}/icons/hicolor/24x24/apps/sync.png
 %{_datadir}/icons/hicolor/22x22/apps/sync.png
 %{_datadir}/icons/hicolor/16x16/apps/sync.png
-%{_datadir}/icons/gray_icon.png
-%{_datadir}/icons/green_icon.png
 %{_datadir}/kde4/services/kcm_sync.desktop
-%{_datadir}/kde4/services/syncfileitemplugin.desktop
 %{_libdir}/kde4/kcm_sync.so
-%{_libdir}/kde4/syncfileitemplugin.so
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/psyncconfig.po
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/psyncconfig.mo
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/psyncnotify.po
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/psyncnotify.mo
+%if %with_dolphin
+%{_datadir}/kde4/services/syncfileitemplugin.desktop
+%{_libdir}/kde4/syncfileitemplugin.so
+%{_datadir}/icons/gray_icon.png
+%{_datadir}/icons/green_icon.png
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/syncfileitemplugin.po
 %lang(ru_RU) %{_datadir}/locale/ru/LC_MESSAGES/syncfileitemplugin.mo
-
+%endif
 #-------------------------------------------------------------------------------
 
 %define major_psync 1
-%define libpsync %mklibname psync
+%define libpsync %mklibname psync %major_psync
 #define __find_requires /usr/{_lib}/rpm/mandriva/find-requires
 %undefine __find_requires
       
@@ -108,6 +114,7 @@ Development files for Rosa Sync
 
 %prep
 %setup -c -q
+%patch1 -p0
 
 %build
 
@@ -191,10 +198,12 @@ qmake psyncnotify.pro
 %make
 cd ..
 
+%if %with_dolphin
 cd dolphin-plugin
 qmake syncfileitemplugin.pro
 %make
 cd ..
+%endif
 
 ### For update from 755 to now
 cd install_update
@@ -214,7 +223,9 @@ make INSTALL_ROOT=%buildroot -C psyncnotify install
 make INSTALL_ROOT=%buildroot -C syncd install
 make INSTALL_ROOT=%buildroot -C syncconfigapp install
 make INSTALL_ROOT=%buildroot -C libsync_db install
+%if %with_dolphin
 make INSTALL_ROOT=%buildroot -C dolphin-plugin install
+%endif
 make INSTALL_ROOT=%buildroot -C libsyncdbus install
 make INSTALL_ROOT=%buildroot -C install_update install
                            

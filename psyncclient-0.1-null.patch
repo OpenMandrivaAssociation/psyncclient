@@ -1,0 +1,11 @@
+--- syncd/include/session.h.orig	2015-02-06 19:23:05.784388398 +0000
++++ syncd/include/session.h	2015-02-06 19:23:16.960387574 +0000
+@@ -311,7 +311,7 @@
+     int logout();
+     int getDiskQuota(disk_quota *dq);
+     int getFile(string id, string path, size_t size, mode_t mode);
+-    int putFile(const string & dir_id, const string & file, const string & sName, file_properties *fp=false, bool overwrite=true);//, bool versioned=false);
++    int putFile(const string & dir_id, const string & file, const string & sName, file_properties *fp=NULL, bool overwrite=true);//, bool versioned=false);
+     int removeFile(string id);
+     int makeDir(const string & id_,const string & name_,const string & path, dir_properties &dp);
+     int removeDir(string id, bool recursive=true);
