@@ -5,13 +5,13 @@
 Summary:       ROSA Sync client
 Name:          psyncclient
 Version:       0.1
-Release:       80
+Release:       81
 License:       GPLv3
 Group:         Graphical desktop/KDE
 URL:           http://2safe.com
 Source:        %{name}-%{version}.tar.gz
 Patch1:		psyncclient-0.1-null.patch
-Requires:      %{_lib}psync = %{version}-%{release}
+Requires:      %{_lib}psync1 = %{version}-%{release}
 Requires:      %{_lib}config9 >= 1.4.8
 Requires:      %{_lib}jsoncpp0 >= 0.5.0
 Requires:      %{_lib}curl4 >= 7.26.0
