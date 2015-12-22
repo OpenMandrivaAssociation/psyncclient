@@ -13,7 +13,7 @@ Source:        %{name}-%{version}.tar.gz
 Patch1:		psyncclient-0.1-null.patch
 Requires:      %{_lib}psync1 = %{version}-%{release}
 Requires:      %{_lib}config9 >= 1.4.8
-Requires:      %{_lib}jsoncpp0 >= 0.5.0
+Requires:      %{_lib}jsoncpp1 >= 0.5.0
 Requires:      %{_lib}curl4 >= 7.26.0
 Requires:      kdebase4-workspace >= 4.8.1
 BuildRequires: qt4-devel
