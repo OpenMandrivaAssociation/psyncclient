@@ -116,6 +116,8 @@ Development files for Rosa Sync
 %setup -c -q
 %patch1 -p0
 
+sed -i 's#jsoncpp/#json/#' syncd/include/*.h
+
 %build
 
 sed -i 's/\/usr\/lib/\/usr\/%_lib/' ./liblcfg/liblcfg.pro
