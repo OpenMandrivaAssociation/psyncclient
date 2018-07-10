@@ -5,7 +5,7 @@
 Summary:       ROSA Sync client
 Name:          psyncclient
 Version:       0.1
-Release:       83
+Release:       84
 License:       GPLv3
 Group:         Graphical desktop/KDE
 URL:           http://2safe.com
