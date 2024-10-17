@@ -8,7 +8,7 @@ Version:       0.1
 Release:       84
 License:       GPLv3
 Group:         Graphical desktop/KDE
-URL:           http://2safe.com
+URL:           https://2safe.com
 Source:        %{name}-%{version}.tar.gz
 Patch1:		psyncclient-0.1-null.patch
 Requires:      %{_lib}psync1 = %{version}-%{release}
