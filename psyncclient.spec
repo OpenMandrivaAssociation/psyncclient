@@ -16,6 +16,7 @@ Requires:      %{_lib}config9 >= 1.4.8
 Requires:      %{_lib}jsoncpp1 >= 0.5.0
 Requires:      %{_lib}curl4 >= 7.26.0
 Requires:      kdebase4-workspace >= 4.8.1
+BuildRequires:	make
 BuildRequires: qt4-devel
 BuildRequires: kdelibs4-devel
 BuildRequires: kdebase4-devel
